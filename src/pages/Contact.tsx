@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import emailjs from '@emailjs/browser';
 import { motion } from 'framer-motion';
 import Layout from '@/components/layout/Layout';
 import { Phone, Mail, MapPin, MessageCircle, Instagram, Facebook, Send } from 'lucide-react';
@@ -10,14 +11,14 @@ import { useToast } from '@/hooks/use-toast';
 // TikTok icon component
 const TikTokIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
   </svg>
 );
 
 // Telegram icon component
 const TelegramIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-    <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+    <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
   </svg>
 );
 
@@ -26,7 +27,7 @@ const Contact: React.FC = () => {
   const whatsappNumber = '15551234567';
   const email = 'hello@savannaphoto.com';
   const { toast } = useToast();
-  
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -42,7 +43,7 @@ const Contact: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Basic validation
     if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
       toast({
@@ -65,16 +66,29 @@ const Contact: React.FC = () => {
     }
 
     setIsSubmitting(true);
-    
-    // Simulate form submission (replace with actual API call)
+
+    // EmailJS Configuration
+    const SERVICE_ID = 'service_zqdicag';
+    const TEMPLATE_ID = 'template_bekjfyh';
+    const PUBLIC_KEY = 'gBqD9HI_j_T0uVknz';
+
+    const templateParams = {
+      from_name: formData.name,
+      from_email: formData.email,
+      phone: formData.phone,
+      message: formData.message,
+    };
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY);
+
       toast({
         title: "Message Sent!",
         description: "We'll get back to you as soon as possible.",
       });
       setFormData({ name: '', email: '', phone: '', message: '' });
     } catch (error) {
+      console.error('EmailJS Error:', error);
       toast({
         title: "Error",
         description: "Failed to send message. Please try again.",
@@ -100,7 +114,7 @@ const Contact: React.FC = () => {
             </p>
             <h1 className="heading-display mb-6">Contact Us</h1>
             <p className="max-w-2xl mx-auto text-muted-foreground">
-              We'd love to hear from you. Reach out to discuss your photography needs 
+              We'd love to hear from you. Reach out to discuss your photography needs
               or simply say hello.
             </p>
           </motion.div>
@@ -120,7 +134,7 @@ const Contact: React.FC = () => {
                 transition={{ duration: 0.6 }}
               >
                 <h2 className="heading-section mb-8">Reach Out</h2>
-                
+
                 <div className="space-y-6">
                   {/* Phone */}
                   <div className="flex items-start space-x-4">
@@ -129,7 +143,7 @@ const Contact: React.FC = () => {
                     </div>
                     <div>
                       <h3 className="font-medium mb-1">Phone</h3>
-                      <a 
+                      <a
                         href={`tel:${phoneNumber}`}
                         className="text-muted-foreground hover:text-foreground transition-colors"
                       >
@@ -145,7 +159,7 @@ const Contact: React.FC = () => {
                     </div>
                     <div>
                       <h3 className="font-medium mb-1">WhatsApp</h3>
-                      <a 
+                      <a
                         href={`https://wa.me/${whatsappNumber}`}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -163,7 +177,7 @@ const Contact: React.FC = () => {
                     </div>
                     <div>
                       <h3 className="font-medium mb-1">Email</h3>
-                      <a 
+                      <a
                         href={`mailto:${email}`}
                         className="text-muted-foreground hover:text-foreground transition-colors"
                       >
@@ -196,41 +210,41 @@ const Contact: React.FC = () => {
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
                 <h2 className="heading-section mb-8">Connect</h2>
-                
+
                 {/* Social Links */}
                 <div className="mb-12">
                   <h3 className="font-medium mb-4">Follow Us</h3>
                   <div className="flex items-center flex-wrap gap-3">
-                    <a 
-                      href="https://instagram.com" 
-                      target="_blank" 
+                    <a
+                      href="https://instagram.com"
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="w-12 h-12 border border-border rounded-full flex items-center justify-center hover:bg-muted transition-colors"
                       aria-label="Instagram"
                     >
                       <Instagram className="w-5 h-5" />
                     </a>
-                    <a 
-                      href="https://facebook.com" 
-                      target="_blank" 
+                    <a
+                      href="https://facebook.com"
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="w-12 h-12 border border-border rounded-full flex items-center justify-center hover:bg-muted transition-colors"
                       aria-label="Facebook"
                     >
                       <Facebook className="w-5 h-5" />
                     </a>
-                    <a 
-                      href="https://tiktok.com" 
-                      target="_blank" 
+                    <a
+                      href="https://tiktok.com"
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="w-12 h-12 border border-border rounded-full flex items-center justify-center hover:bg-muted transition-colors"
                       aria-label="TikTok"
                     >
                       <TikTokIcon className="w-5 h-5" />
                     </a>
-                    <a 
-                      href="https://t.me/savannaphoto" 
-                      target="_blank" 
+                    <a
+                      href="https://t.me/savannaphoto"
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="w-12 h-12 border border-border rounded-full flex items-center justify-center hover:bg-muted transition-colors"
                       aria-label="Telegram"
@@ -384,7 +398,7 @@ const Contact: React.FC = () => {
           >
             <h2 className="heading-section mb-6">Let's Create Something Beautiful</h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Whether you're planning a wedding, looking for family portraits, or need 
+              Whether you're planning a wedding, looking for family portraits, or need
               professional event coverage, we're here to bring your vision to life.
             </p>
           </motion.div>
