@@ -2,6 +2,7 @@ import React from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import Preloader from './Preloader';
+
 import ScrollToTop from './ScrollToTop';
 import CursorFollower from './CursorFollower';
 

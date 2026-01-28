@@ -8,7 +8,7 @@ const Preloader: React.FC = () => {
     // Simulate loading time and wait for page content
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 2000);
+    }, 500);
 
     return () => clearTimeout(timer);
   }, []);
@@ -30,7 +30,7 @@ const Preloader: React.FC = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="mb-8"
             >
-              <motion.span 
+              <motion.span
                 className="font-heading text-4xl md:text-5xl tracking-wide block"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -38,7 +38,7 @@ const Preloader: React.FC = () => {
               >
                 SAVANNA
               </motion.span>
-              <motion.span 
+              <motion.span
                 className="block text-xs tracking-[0.4em] text-muted-foreground uppercase mt-2"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
