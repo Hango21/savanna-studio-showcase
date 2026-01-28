@@ -26,17 +26,18 @@ const AdminLogin: React.FC = () => {
     try {
       const response = await axios.post(API_ENDPOINTS.login, { email, password });
       const { token } = response.data;
-      
+
       login(token);
       toast({
         title: 'Welcome back!',
         description: 'You have successfully logged in.',
       });
       navigate('/admin');
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as any; // Standard axios error handling in this context
       toast({
         title: 'Login failed',
-        description: err.response?.data?.message || 'Invalid credentials. Please try again.',
+        description: error.response?.data?.message || 'Invalid credentials. Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -61,7 +62,7 @@ const AdminLogin: React.FC = () => {
 
         <div className="bg-card border border-border p-8 rounded-lg">
           <h2 className="text-xl font-heading mb-6 text-center">Sign In</h2>
-          
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>

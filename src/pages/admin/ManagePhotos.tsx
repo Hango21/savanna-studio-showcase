@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { API_ENDPOINTS, getAuthHeaders } from '@/config/api';
@@ -28,7 +28,7 @@ const ManagePhotos: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const headers = getAuthHeaders();
       const [photosRes, categoriesRes] = await Promise.all([
@@ -46,11 +46,11 @@ const ManagePhotos: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const handleAddPhoto = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -159,7 +159,7 @@ const ManagePhotos: React.FC = () => {
           <div className="p-4 border-b border-border">
             <h2 className="font-heading text-lg">Portfolio Photos ({photos.length})</h2>
           </div>
-          
+
           {loading ? (
             <div className="p-8 text-center text-muted-foreground">Loading...</div>
           ) : photos.length === 0 ? (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { API_ENDPOINTS, getAuthHeaders } from '@/config/api';
@@ -20,7 +20,7 @@ const ManageCategories: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const response = await axios.get(API_ENDPOINTS.categories, {
         headers: getAuthHeaders(),
@@ -35,11 +35,11 @@ const ManageCategories: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [fetchCategories]);
 
   const handleAddCategory = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,7 +126,7 @@ const ManageCategories: React.FC = () => {
           <div className="p-4 border-b border-border">
             <h2 className="font-heading text-lg">Categories ({categories.length})</h2>
           </div>
-          
+
           {loading ? (
             <div className="p-8 text-center text-muted-foreground">Loading...</div>
           ) : categories.length === 0 ? (
