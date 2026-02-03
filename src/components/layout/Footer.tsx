@@ -58,7 +58,7 @@ const Footer: React.FC = () => {
             <h4 className="font-heading text-lg mb-4">Connect</h4>
             <div className="flex items-center justify-center md:justify-start flex-wrap gap-3">
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/savannaphotostudio/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 border border-border rounded-full hover:bg-muted transition-colors"
@@ -76,7 +76,7 @@ const Footer: React.FC = () => {
                 <Facebook className="h-5 w-5" />
               </a>
               <a
-                href="https://tiktok.com"
+                href="https://www.tiktok.com/@photosavanna?is_from_webapp=1&sender_device=pc"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 border border-border rounded-full hover:bg-muted transition-colors"
@@ -94,7 +94,7 @@ const Footer: React.FC = () => {
                 <TelegramIcon className="h-5 w-5" />
               </a>
               <a
-                href="mailto:hello@savannaphoto.com"
+                href="mailto:melikaebrahim0@gmail.com"
                 className="p-2 border border-border rounded-full hover:bg-muted transition-colors"
                 aria-label="Email"
               >
@@ -115,7 +115,8 @@ const Footer: React.FC = () => {
                   rel="noopener noreferrer"
                   className="hover:text-foreground transition-colors"
                 >
-                  Gurdshola Beside CBE, Addis Ababa, Ethiopia
+                  Gurdshola Beside CBE<br />
+                  Addis Ababa, Ethiopia
                 </a>
               </div>
               <div className="flex items-start justify-center md:justify-start gap-2 text-sm text-muted-foreground">

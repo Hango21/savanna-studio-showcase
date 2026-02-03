@@ -23,9 +23,9 @@ const TelegramIcon = ({ className }: { className?: string }) => (
 );
 
 const Contact: React.FC = () => {
-  const phoneNumber = '+1 (555) 123-4567';
-  const whatsappNumber = '15551234567';
-  const email = 'hello@savannaphoto.com';
+  const phoneNumber = '+251911602238/+251911312525';
+  const whatsappNumber = '+251911602238';
+  const email = 'melikaebrahim0@gmail.com';
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -194,8 +194,8 @@ const Contact: React.FC = () => {
                     <div>
                       <h3 className="font-medium mb-1">Studio Location</h3>
                       <p className="text-muted-foreground">
-                        123 Photography Lane<br />
-                        Creative District, CD 12345
+                        Gurdshola Beside CBE<br />
+                        Addis Ababa, Ethiopia
                       </p>
                     </div>
                   </div>
@@ -216,7 +216,7 @@ const Contact: React.FC = () => {
                   <h3 className="font-medium mb-4">Follow Us</h3>
                   <div className="flex items-center flex-wrap gap-3">
                     <a
-                      href="https://instagram.com"
+                      href="https://www.instagram.com/savannaphotostudio/"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-12 h-12 border border-border rounded-full flex items-center justify-center hover:bg-muted transition-colors"
@@ -234,7 +234,7 @@ const Contact: React.FC = () => {
                       <Facebook className="w-5 h-5" />
                     </a>
                     <a
-                      href="https://tiktok.com"
+                      href="https://www.tiktok.com/@photosavanna?is_from_webapp=1&sender_device=pc"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-12 h-12 border border-border rounded-full flex items-center justify-center hover:bg-muted transition-colors"
@@ -259,16 +259,12 @@ const Contact: React.FC = () => {
                   <h3 className="font-medium mb-4">Studio Hours</h3>
                   <div className="space-y-2 text-muted-foreground">
                     <div className="flex justify-between">
-                      <span>Monday - Friday</span>
-                      <span>9:00 AM - 6:00 PM</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Saturday</span>
-                      <span>10:00 AM - 4:00 PM</span>
+                      <span>Monday - Saturday</span>
+                      <span>8:30 AM - 9:00 PM</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Sunday</span>
-                      <span>By Appointment</span>
+                      <span>9:00 AM - 9:00 PM</span>
                     </div>
                   </div>
                 </div>
