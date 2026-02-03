@@ -110,12 +110,12 @@ const Footer: React.FC = () => {
               <div className="flex items-start justify-center md:justify-start gap-2 text-sm text-muted-foreground">
                 <MapPin className="h-5 w-5 flex-shrink-0 mt-0.5" />
                 <a
-                  href="https://maps.google.com/?q=Nairobi,Kenya"
+                  href="https://maps.google.com/?q=9.018647412357648,38.82189362301629"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-foreground transition-colors"
                 >
-                  Nairobi, Kenya
+                  Gurdshola Beside CBE, Addis Ababa, Ethiopia
                 </a>
               </div>
               <div className="flex items-start justify-center md:justify-start gap-2 text-sm text-muted-foreground">
@@ -129,7 +129,7 @@ const Footer: React.FC = () => {
               </div>
               <div className="mt-4">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d255282.35866269596!2d36.70730744999999!3d-1.2920659!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f1172d84d49a7%3A0xf7cf0254b297924c!2sNairobi%2C%20Kenya!5e0!3m2!1sen!2s!4v1234567890123!5m2!1sen!2s"
+                  src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3940.3179!2d38.82189362301629!3d9.018647412357648!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zOcKwMDEnMDcuMSJOIDM4wrA0OScxOC44IkU!5e0!3m2!1sen!2s!4v1234567890123!5m2!1sen!2s"
                   width="100%"
                   height="200"
                   style={{ border: 0 }}
