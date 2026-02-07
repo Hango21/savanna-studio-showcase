@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const Admin = require('../models/Admin');
@@ -10,10 +10,10 @@ const importData = async () => {
     try {
         await Admin.deleteMany();
 
-        const hashedPassword = await bcrypt.hash('hm252531', 10);
+        const hashedPassword = await bcrypt.hash('admin123', 10);
 
         const adminUser = {
-            username: 'melikaebrahim0@gmail.com',
+            username: 'admin',
             password: hashedPassword,
         };
 

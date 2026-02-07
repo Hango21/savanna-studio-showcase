@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const Admin = require('../models/Admin');
@@ -20,7 +20,7 @@ const verify = async () => {
 
         console.log(`Stored Username: '${admin.username}'`);
 
-        const password = 'hm252531';
+        const password = 'admin123';
         const isMatch = await bcrypt.compare(password, admin.password);
 
         console.log(`Testing password '${password}' against hash...`);
