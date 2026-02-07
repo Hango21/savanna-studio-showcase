@@ -9,6 +9,13 @@ import { useToast } from '@/hooks/use-toast';
 import { Plus, Trash2, GripVertical } from 'lucide-react';
 import { cloudinaryService } from '@/services/cloudinary';
 
+interface Slide {
+  _id: string;
+  title: string;
+  imageUrl: string;
+  order: number;
+}
+
 interface Photo {
   _id: string;
   imageUrl: string;
@@ -43,6 +50,14 @@ const ManageSlideshow: React.FC = () => {
       setSlides(slidesRes.data);
       setPortfolioPhotos(photosRes.data);
       setCategories(categoriesRes.data);
+
+      // Auto-set next order
+      if (slidesRes.data.length > 0) {
+        const maxOrder = Math.max(...slidesRes.data.map((s: Slide) => s.order));
+        setNewSlide(prev => ({ ...prev, order: maxOrder + 1 }));
+      } else {
+        setNewSlide(prev => ({ ...prev, order: 1 }));
+      }
     } catch (err) {
       toast({
         title: 'Error',
@@ -110,7 +125,7 @@ const ManageSlideshow: React.FC = () => {
         title: 'Success',
         description: 'Slide added successfully.',
       });
-      setNewSlide({ title: '', imageUrl: '', order: slides.length + 1 });
+      setNewSlide({ title: '', imageUrl: '', order: slides.length + 2 });
       setFile(null);
       fetchData();
     } catch (err: any) {
@@ -125,9 +140,30 @@ const ManageSlideshow: React.FC = () => {
     }
   };
 
+  const handleDeleteSlide = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this slide?')) return;
+
+    try {
+      await axios.delete(API_ENDPOINTS.slideById(id), {
+        headers: getAuthHeaders(),
+      });
+      toast({
+        title: 'Success',
+        description: 'Slide deleted successfully.',
+      });
+      fetchData();
+    } catch (err) {
+      toast({
+        title: 'Error',
+        description: 'Could not delete slide.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const filteredPhotos = activeCategory === 'all'
     ? portfolioPhotos
-    : portfolioPhotos.filter(p => (p.category as any)._id === activeCategory || p.category === activeCategory);
+    : portfolioPhotos.filter(p => (typeof p.category === 'object' && (p.category as any)?._id === activeCategory) || p.category === activeCategory);
 
   return (
     <AdminLayout>
@@ -218,8 +254,8 @@ const ManageSlideshow: React.FC = () => {
                         key={photo._id}
                         onClick={() => setNewSlide({ ...newSlide, imageUrl: photo.imageUrl })}
                         className={`aspect-square rounded overflow-hidden cursor-pointer border-2 transition-all ${newSlide.imageUrl === photo.imageUrl
-                            ? 'border-primary scale-95 ring-2 ring-primary/20'
-                            : 'border-transparent hover:border-muted-foreground/50'
+                          ? 'border-primary scale-95 ring-2 ring-primary/20'
+                          : 'border-transparent hover:border-muted-foreground/50'
                           }`}
                       >
                         <img
@@ -232,7 +268,7 @@ const ManageSlideshow: React.FC = () => {
                   </div>
                   {newSlide.imageUrl && (
                     <div className="flex items-center gap-4 p-2 bg-secondary/50 rounded animate-in fade-in slide-in-from-top-1">
-                      <div className="w-12 h-12 rounded overflow-hidden border border-border">
+                      <div className="w-12 h-12 rounded overflow-hidden border border-border flex-shrink-0">
                         <img src={newSlide.imageUrl} className="w-full h-full object-cover" />
                       </div>
                       <p className="text-xs text-muted-foreground truncate flex-1">{newSlide.imageUrl}</p>
@@ -322,7 +358,5 @@ const ManageSlideshow: React.FC = () => {
     </AdminLayout>
   );
 };
-
-export default ManageSlideshow;
 
 export default ManageSlideshow;
