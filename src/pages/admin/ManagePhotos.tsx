@@ -26,7 +26,7 @@ const ManagePhotos: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [newPhoto, setNewPhoto] = useState({ imageUrl: '', category: '' });
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<FileList | null>(null);
   const [uploadMode, setUploadMode] = useState<'url' | 'file'>('file');
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
@@ -60,62 +60,88 @@ const ManagePhotos: React.FC = () => {
     setSubmitting(true);
 
     try {
-      let finalImageUrl = newPhoto.imageUrl;
+      if (uploadMode === 'file' && files && files.length > 0) {
+        const fileArray = Array.from(files);
+        let successCount = 0;
 
-      if (uploadMode === 'file' && file) {
-        // Enforce 15MB limit
-        if (file.size > 15 * 1024 * 1024) {
+        for (let i = 0; i < fileArray.length; i++) {
+          const file = fileArray[i];
+
+          // Enforce 15MB limit per file
+          if (file.size > 15 * 1024 * 1024) {
+            toast({
+              title: 'Skip File',
+              description: `File "${file.name}" is too large (>15MB).`,
+              variant: 'destructive',
+            });
+            continue;
+          }
+
           toast({
-            title: 'Error',
-            description: 'File size too large. Maximum size is 15MB.',
-            variant: 'destructive',
+            title: `Uploading (${i + 1}/${fileArray.length})`,
+            description: `Uploading "${file.name}"...`,
           });
-          setSubmitting(false);
-          return;
+
+          try {
+            const uploadedUrl = await cloudinaryService.uploadFile(file);
+
+            await axios.post(
+              API_ENDPOINTS.photos,
+              {
+                imageUrl: uploadedUrl,
+                category: newPhoto.category,
+              },
+              {
+                headers: getAuthHeaders(),
+              }
+            );
+            successCount++;
+          } catch (uploadErr: any) {
+            toast({
+              title: 'Upload Failed',
+              description: `Failed to upload "${file.name}".`,
+              variant: 'destructive',
+            });
+          }
         }
 
-        // Upload directly to Cloudinary
         toast({
-          title: 'Uploading...',
-          description: 'Uploading image directly to Cloudinary...',
+          title: 'Bulk Upload Complete',
+          description: `Successfully added ${successCount} photos.`,
         });
-        finalImageUrl = await cloudinaryService.uploadFile(file);
-      }
-
-      if (!finalImageUrl) {
+        setFiles(null);
+      } else if (uploadMode === 'url' && newPhoto.imageUrl) {
+        await axios.post(
+          API_ENDPOINTS.photos,
+          {
+            imageUrl: newPhoto.imageUrl,
+            category: newPhoto.category,
+          },
+          {
+            headers: getAuthHeaders(),
+          }
+        );
+        toast({
+          title: 'Success',
+          description: 'Photo added successfully.',
+        });
+      } else {
         toast({
           title: 'Error',
-          description: 'Please provide an image URL or upload a file.',
+          description: 'Please provide an image URL or upload file(s).',
           variant: 'destructive',
         });
         setSubmitting(false);
         return;
       }
 
-      // Send the resulting URL to our backend
-      await axios.post(
-        API_ENDPOINTS.photos,
-        {
-          imageUrl: finalImageUrl,
-          category: newPhoto.category,
-        },
-        {
-          headers: getAuthHeaders(),
-        }
-      );
-
-      toast({
-        title: 'Success',
-        description: 'Photo added successfully.',
-      });
-      setNewPhoto({ imageUrl: '', category: '' });
-      setFile(null);
+      setNewPhoto({ ...newPhoto, imageUrl: '' });
       fetchData();
     } catch (err: any) {
       console.error(err);
       toast({
         title: 'Error',
-        description: err.message || 'Could not add photo. Please try again.',
+        description: err.message || 'Could not complete the request.',
         variant: 'destructive',
       });
     } finally {
@@ -183,15 +209,18 @@ const ManagePhotos: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="imageInput">
-                  {uploadMode === 'file' ? 'Select Image' : 'Image URL'}
+                  {uploadMode === 'file'
+                    ? `Select Images ${files ? `(${files.length} selected)` : ''}`
+                    : 'Image URL'}
                 </Label>
                 {uploadMode === 'file' ? (
                   <Input
                     id="imageInput"
                     type="file"
                     accept="image/*"
-                    onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
-                    required={!newPhoto.imageUrl}
+                    multiple
+                    onChange={(e) => setFiles(e.target.files)}
+                    required={!files}
                   />
                 ) : (
                   <Input
