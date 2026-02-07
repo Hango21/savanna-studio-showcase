@@ -63,46 +63,52 @@ const ManagePhotos: React.FC = () => {
       if (uploadMode === 'file' && files && files.length > 0) {
         const fileArray = Array.from(files);
         let successCount = 0;
+        const BATCH_SIZE = 3; // Upload 3 at a time for speed vs stability balance
 
-        for (let i = 0; i < fileArray.length; i++) {
-          const file = fileArray[i];
+        for (let i = 0; i < fileArray.length; i += BATCH_SIZE) {
+          const batch = fileArray.slice(i, i + BATCH_SIZE);
 
-          // Enforce 15MB limit per file
-          if (file.size > 15 * 1024 * 1024) {
+          await Promise.all(batch.map(async (file, batchIndex) => {
+            const overallIndex = i + batchIndex;
+
+            // Enforce 15MB limit per file
+            if (file.size > 15 * 1024 * 1024) {
+              toast({
+                title: 'Skip File',
+                description: `File "${file.name}" is too large (>15MB).`,
+                variant: 'destructive',
+              });
+              return;
+            }
+
             toast({
-              title: 'Skip File',
-              description: `File "${file.name}" is too large (>15MB).`,
-              variant: 'destructive',
+              title: `Processing (${overallIndex + 1}/${fileArray.length})`,
+              description: `Uploading "${file.name}"...`,
             });
-            continue;
-          }
 
-          toast({
-            title: `Uploading (${i + 1}/${fileArray.length})`,
-            description: `Uploading "${file.name}"...`,
-          });
+            try {
+              const uploadedUrl = await cloudinaryService.uploadFile(file);
 
-          try {
-            const uploadedUrl = await cloudinaryService.uploadFile(file);
-
-            await axios.post(
-              API_ENDPOINTS.photos,
-              {
-                imageUrl: uploadedUrl,
-                category: newPhoto.category,
-              },
-              {
-                headers: getAuthHeaders(),
-              }
-            );
-            successCount++;
-          } catch (uploadErr: any) {
-            toast({
-              title: 'Upload Failed',
-              description: `Failed to upload "${file.name}".`,
-              variant: 'destructive',
-            });
-          }
+              await axios.post(
+                API_ENDPOINTS.photos,
+                {
+                  imageUrl: uploadedUrl,
+                  category: newPhoto.category,
+                },
+                {
+                  headers: getAuthHeaders(),
+                }
+              );
+              successCount++;
+            } catch (uploadErr: any) {
+              console.error(`Error uploading ${file.name}:`, uploadErr);
+              toast({
+                title: 'Upload Failed',
+                description: `Failed to upload "${file.name}".`,
+                variant: 'destructive',
+              });
+            }
+          }));
         }
 
         toast({
