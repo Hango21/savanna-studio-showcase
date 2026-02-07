@@ -13,7 +13,8 @@ import {
   Sun,
   Moon,
   Menu,
-  X
+  X,
+  Home
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -22,7 +23,7 @@ const navItems = [
   { name: 'Slideshow', path: '/admin/slideshow', icon: Layers },
   { name: 'Photos', path: '/admin/photos', icon: Images },
   { name: 'Categories', path: '/admin/categories', icon: FolderOpen },
-  { name: 'Homepage', path: '/admin/homepage', icon: Layers },
+  { name: 'Homepage', path: '/admin/homepage', icon: Home },
   { name: 'Settings', path: '/admin/settings', icon: Settings },
 ];
 
