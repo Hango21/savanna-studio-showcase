@@ -19,6 +19,10 @@ export const API_ENDPOINTS = {
   // Categories
   categories: `${API_BASE_URL}/api/categories`,
   categoryById: (id: string) => `${API_BASE_URL}/api/categories/${id}`,
+
+  // Settings
+  settings: `${API_BASE_URL}/api/settings`,
+  settingByKey: (key: string) => `${API_BASE_URL}/api/settings/${key}`,
 };
 
 // Auth helpers

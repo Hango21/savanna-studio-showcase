@@ -8,6 +8,9 @@ import maternityImage from '@/assets/maternity-portrait.jpg';
 import familyImage from '@/assets/family-portrait.jpg';
 import aboutImage from '@/assets/about-photographer.jpg';
 
+import { API_ENDPOINTS } from '@/config/api';
+import axios from 'axios';
+
 const fadeInUp = {
   initial: { opacity: 0, y: 40 },
   animate: { opacity: 1, y: 0 },
@@ -25,7 +28,24 @@ const staggerContainer = {
 
 const Index: React.FC = () => {
   const { scrollYProgress } = useScroll();
-  
+  const [settings, setSettings] = React.useState<Record<string, string>>({});
+
+  React.useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await axios.get(API_ENDPOINTS.settings);
+        const settingsMap = response.data.reduce((acc: any, curr: any) => {
+          acc[curr.key] = curr.value;
+          return acc;
+        }, {});
+        setSettings(settingsMap);
+      } catch (err) {
+        console.error('Error fetching settings:', err);
+      }
+    };
+    fetchSettings();
+  }, []);
+
   // Parallax transforms
   const heroY = useTransform(scrollYProgress, [0, 0.3], [0, -50]);
   const missionY = useTransform(scrollYProgress, [0.3, 0.6], [0, -80]);
@@ -35,24 +55,24 @@ const Index: React.FC = () => {
     <Layout>
       {/* Hero Section with Slideshow */}
       <section className="relative overflow-hidden">
-        <motion.div 
+        <motion.div
           style={{ y: heroY }}
           className="container-boxed py-8"
         >
           <Slideshow />
-          <motion.div 
+          <motion.div
             className="text-center mt-8"
             variants={staggerContainer}
             initial="initial"
             animate="animate"
           >
-            <motion.p 
+            <motion.p
               variants={fadeInUp}
               className="text-sm tracking-[0.3em] uppercase text-muted-foreground mb-4"
             >
               Wedding & Lifestyle Photographer
             </motion.p>
-            <motion.h1 
+            <motion.h1
               variants={fadeInUp}
               className="heading-display mb-6"
             >
@@ -77,7 +97,7 @@ const Index: React.FC = () => {
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             >
-              <motion.p 
+              <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -86,7 +106,7 @@ const Index: React.FC = () => {
               >
                 Here's to Life
               </motion.p>
-              <motion.h2 
+              <motion.h2
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -95,18 +115,18 @@ const Index: React.FC = () => {
               >
                 It's time to let people know that you are the business they have been searching for.
               </motion.h2>
-              <motion.p 
+              <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.3 }}
                 className="text-muted-foreground leading-relaxed mb-8"
               >
-                Every moment tells a story. From the gentle touch of morning light to the 
-                whispered vows of eternal love, we capture the beauty that lives in between 
+                Every moment tells a story. From the gentle touch of morning light to the
+                whispered vows of eternal love, we capture the beauty that lives in between
                 the seconds. Our lens finds poetry in the ordinary and magic in the mundane.
               </motion.p>
-              <motion.p 
+              <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -123,14 +143,14 @@ const Index: React.FC = () => {
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
               className="relative"
             >
-              <motion.div 
+              <motion.div
                 className="aspect-[4/5] image-frame"
                 whileHover={{ scale: 1.02 }}
                 transition={{ duration: 0.4 }}
               >
-                <img 
-                  src={weddingImage} 
-                  alt="Wedding photography" 
+                <img
+                  src={settings.home_intro_image || weddingImage}
+                  alt="Wedding photography"
                   className="w-full h-full object-cover"
                 />
               </motion.div>
@@ -171,27 +191,27 @@ const Index: React.FC = () => {
                 initial={{ opacity: 0, y: 60 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
-                transition={{ 
-                  duration: 0.8, 
+                transition={{
+                  duration: 0.8,
                   delay: index * 0.15,
                   ease: [0.22, 1, 0.36, 1]
                 }}
                 className="group cursor-pointer"
               >
-                <motion.div 
+                <motion.div
                   className="aspect-[3/4] overflow-hidden image-frame mb-4"
                   whileHover={{ scale: 1.02 }}
                   transition={{ duration: 0.4 }}
                 >
-                  <motion.img 
-                    src={service.image} 
+                  <motion.img
+                    src={service.image}
                     alt={service.title}
                     className="w-full h-full object-cover"
                     whileHover={{ scale: 1.1 }}
                     transition={{ duration: 0.6 }}
                   />
                 </motion.div>
-                <motion.h3 
+                <motion.h3
                   className="font-heading text-lg tracking-widest uppercase text-center"
                   whileHover={{ letterSpacing: '0.2em' }}
                   transition={{ duration: 0.3 }}
@@ -218,10 +238,10 @@ const Index: React.FC = () => {
 
       {/* Mission Statement - Parallax Section */}
       <section className="relative py-32 md:py-40 overflow-hidden">
-        <motion.div 
+        <motion.div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ 
-            backgroundImage: `url(${weddingImage})`,
+          style={{
+            backgroundImage: `url(${settings.home_mission_bg || weddingImage})`,
             y: missionY,
             scale: missionScale
           }}
@@ -234,7 +254,7 @@ const Index: React.FC = () => {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
           >
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
@@ -243,7 +263,7 @@ const Index: React.FC = () => {
             >
               This is the Perfect Place for Your Business
             </motion.p>
-            <motion.h2 
+            <motion.h2
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -252,16 +272,16 @@ const Index: React.FC = () => {
             >
               Mission Statement
             </motion.h2>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.4 }}
               className="max-w-2xl mx-auto text-muted-foreground leading-relaxed"
             >
-              To preserve the fleeting moments that define our lives, transforming them into 
-              timeless works of art. We believe every love story deserves to be told with 
-              authenticity, creativity, and an unwavering attention to the details that make 
+              To preserve the fleeting moments that define our lives, transforming them into
+              timeless works of art. We believe every love story deserves to be told with
+              authenticity, creativity, and an unwavering attention to the details that make
               each moment uniquely yours.
             </motion.p>
           </motion.div>
@@ -277,7 +297,7 @@ const Index: React.FC = () => {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           >
-            <motion.div 
+            <motion.div
               className="w-24 h-24 rounded-full overflow-hidden mx-auto mb-8 ring-2 ring-gold/20 ring-offset-4 ring-offset-secondary"
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
@@ -285,13 +305,13 @@ const Index: React.FC = () => {
               transition={{ duration: 0.6, delay: 0.1 }}
               whileHover={{ scale: 1.05 }}
             >
-              <img 
-                src={aboutImage} 
-                alt="Client testimonial" 
+              <img
+                src={settings.home_testimonial_avatar || aboutImage}
+                alt="Client testimonial"
                 className="w-full h-full object-cover"
               />
             </motion.div>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -300,18 +320,18 @@ const Index: React.FC = () => {
             >
               It Was Just Divine Working With Them!
             </motion.p>
-            <motion.blockquote 
+            <motion.blockquote
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.3 }}
               className="text-lg md:text-xl leading-relaxed text-muted-foreground mb-6 italic"
             >
-              "From the very first meeting, we knew Savanna Photo Studio was special. They 
-              captured our wedding day with such artistry and care. Every image tells our 
+              "From the very first meeting, we knew Savanna Photo Studio was special. They
+              captured our wedding day with such artistry and care. Every image tells our
               story perfectly. We couldn't be happier with our photos!"
             </motion.blockquote>
-            <motion.cite 
+            <motion.cite
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
@@ -335,14 +355,14 @@ const Index: React.FC = () => {
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
               className="order-2 lg:order-1 relative"
             >
-              <motion.div 
+              <motion.div
                 className="aspect-[4/5] image-frame"
                 whileHover={{ scale: 1.02 }}
                 transition={{ duration: 0.4 }}
               >
-                <img 
-                  src={aboutImage} 
-                  alt="About the photographer" 
+                <img
+                  src={settings.home_about_image || aboutImage}
+                  alt="About the photographer"
                   className="w-full h-full object-cover"
                 />
               </motion.div>
@@ -362,7 +382,7 @@ const Index: React.FC = () => {
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
               className="order-1 lg:order-2"
             >
-              <motion.p 
+              <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -371,7 +391,7 @@ const Index: React.FC = () => {
               >
                 Nice to Meet You
               </motion.p>
-              <motion.h2 
+              <motion.h2
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -380,16 +400,16 @@ const Index: React.FC = () => {
               >
                 Oh, Hello
               </motion.h2>
-              <motion.p 
+              <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.4 }}
                 className="text-muted-foreground leading-relaxed mb-8"
               >
-                Welcome to Savanna Photo Studio. With over a decade of experience capturing 
-                life's most precious moments, we've developed a signature style that blends 
-                natural light, authentic emotion, and artistic vision. We believe in the 
+                Welcome to Savanna Photo Studio. With over a decade of experience capturing
+                life's most precious moments, we've developed a signature style that blends
+                natural light, authentic emotion, and artistic vision. We believe in the
                 power of photography to preserve memories that will be treasured for generations.
               </motion.p>
               <motion.div
@@ -409,5 +429,8 @@ const Index: React.FC = () => {
     </Layout>
   );
 };
+
+export default Index;
+
 
 export default Index;

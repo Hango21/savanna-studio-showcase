@@ -3,12 +3,12 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
-import { 
-  LayoutDashboard, 
-  Images, 
-  FolderOpen, 
-  Layers, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Images,
+  FolderOpen,
+  Layers,
+  Settings,
   LogOut,
   Sun,
   Moon,
@@ -22,6 +22,7 @@ const navItems = [
   { name: 'Slideshow', path: '/admin/slideshow', icon: Layers },
   { name: 'Photos', path: '/admin/photos', icon: Images },
   { name: 'Categories', path: '/admin/categories', icon: FolderOpen },
+  { name: 'Homepage', path: '/admin/homepage', icon: Layers },
   { name: 'Settings', path: '/admin/settings', icon: Settings },
 ];
 
@@ -52,7 +53,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     <div className="min-h-screen flex bg-background">
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
@@ -84,8 +85,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                 onClick={() => setSidebarOpen(false)}
                 className={`
                   flex items-center space-x-3 px-4 py-3 rounded-md transition-colors
-                  ${isActive(item.path) 
-                    ? 'bg-secondary text-foreground' 
+                  ${isActive(item.path)
+                    ? 'bg-secondary text-foreground'
                     : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   }
                 `}

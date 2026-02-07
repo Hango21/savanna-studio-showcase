@@ -20,6 +20,7 @@ import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ManageSlideshow from "./pages/admin/ManageSlideshow";
+import ManageHomepage from "./pages/admin/ManageHomepage";
 import ManagePhotos from "./pages/admin/ManagePhotos";
 import ManageCategories from "./pages/admin/ManageCategories";
 import AdminSettings from "./pages/admin/AdminSettings";
@@ -55,6 +56,14 @@ const AnimatedRoutes = () => {
           element={
             <ProtectedRoute>
               <PageTransition><ManageSlideshow /></PageTransition>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/homepage"
+          element={
+            <ProtectedRoute>
+              <PageTransition><ManageHomepage /></PageTransition>
             </ProtectedRoute>
           }
         />
