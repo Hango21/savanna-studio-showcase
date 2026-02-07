@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Trash2, GripVertical } from 'lucide-react';
+import { cloudinaryService } from '@/services/cloudinary';
 
 interface Slide {
   _id: string;
@@ -50,37 +51,52 @@ const ManageSlideshow: React.FC = () => {
     setSubmitting(true);
 
     try {
-      const headers = getAuthHeaders();
-      let data: any;
+      let finalImageUrl = newSlide.imageUrl;
 
       if (uploadMode === 'file' && file) {
-        if (file.size > 5 * 1024 * 1024) {
+        // Enforce 15MB limit
+        if (file.size > 15 * 1024 * 1024) {
           toast({
             title: 'Error',
-            description: 'File size too large. Maximum size is 5MB.',
+            description: 'File size too large. Maximum size is 15MB.',
             variant: 'destructive',
           });
           setSubmitting(false);
           return;
         }
 
-        const formData = new FormData();
-        formData.append('image', file);
-        formData.append('title', newSlide.title);
-        formData.append('order', newSlide.order.toString());
-        formData.append('active', 'true');
-        data = formData;
-      } else {
-        data = { ...newSlide, active: true };
+        // Upload directly to Cloudinary
+        toast({
+          title: 'Uploading...',
+          description: 'Uploading slide image directly to Cloudinary...',
+        });
+        finalImageUrl = await cloudinaryService.uploadFile(file);
       }
 
-      await axios.post(API_ENDPOINTS.slides, data, {
-        headers: {
-          ...headers,
-          ...(uploadMode === 'file' ? { 'Content-Type': 'multipart/form-data' } : {}),
+      if (!finalImageUrl) {
+        toast({
+          title: 'Error',
+          description: 'Please provide an image URL or upload a file.',
+          variant: 'destructive',
+        });
+        setSubmitting(false);
+        return;
+      }
+
+      // Send the resulting URL to our backend
+      await axios.post(
+        API_ENDPOINTS.slides,
+        {
+          title: newSlide.title,
+          imageUrl: finalImageUrl,
+          order: newSlide.order,
+          active: true,
         },
-        timeout: 60000,
-      });
+        {
+          headers: getAuthHeaders(),
+        }
+      );
+
       toast({
         title: 'Success',
         description: 'Slide added successfully.',
@@ -92,7 +108,7 @@ const ManageSlideshow: React.FC = () => {
       console.error(err);
       toast({
         title: 'Error',
-        description: err.response?.data?.message || 'Could not add slide. Please try a smaller file.',
+        description: err.message || 'Could not add slide. Please try again.',
         variant: 'destructive',
       });
     } finally {

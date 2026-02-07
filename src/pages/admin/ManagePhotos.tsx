@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Trash2 } from 'lucide-react';
+import { cloudinaryService } from '@/services/cloudinary';
 
 interface Photo {
   _id: string;
@@ -59,35 +60,50 @@ const ManagePhotos: React.FC = () => {
     setSubmitting(true);
 
     try {
-      const headers = getAuthHeaders();
-      let data: any;
+      let finalImageUrl = newPhoto.imageUrl;
 
       if (uploadMode === 'file' && file) {
-        if (file.size > 5 * 1024 * 1024) {
+        // Enforce 15MB limit
+        if (file.size > 15 * 1024 * 1024) {
           toast({
             title: 'Error',
-            description: 'File size too large. Maximum size is 5MB.',
+            description: 'File size too large. Maximum size is 15MB.',
             variant: 'destructive',
           });
           setSubmitting(false);
           return;
         }
 
-        const formData = new FormData();
-        formData.append('image', file);
-        formData.append('category', newPhoto.category);
-        data = formData;
-      } else {
-        data = newPhoto;
+        // Upload directly to Cloudinary
+        toast({
+          title: 'Uploading...',
+          description: 'Uploading image directly to Cloudinary...',
+        });
+        finalImageUrl = await cloudinaryService.uploadFile(file);
       }
 
-      await axios.post(API_ENDPOINTS.photos, data, {
-        headers: {
-          ...headers,
-          ...(uploadMode === 'file' ? { 'Content-Type': 'multipart/form-data' } : {}),
+      if (!finalImageUrl) {
+        toast({
+          title: 'Error',
+          description: 'Please provide an image URL or upload a file.',
+          variant: 'destructive',
+        });
+        setSubmitting(false);
+        return;
+      }
+
+      // Send the resulting URL to our backend
+      await axios.post(
+        API_ENDPOINTS.photos,
+        {
+          imageUrl: finalImageUrl,
+          category: newPhoto.category,
         },
-        timeout: 60000, // 60s timeout for client request
-      });
+        {
+          headers: getAuthHeaders(),
+        }
+      );
+
       toast({
         title: 'Success',
         description: 'Photo added successfully.',
@@ -99,7 +115,7 @@ const ManagePhotos: React.FC = () => {
       console.error(err);
       toast({
         title: 'Error',
-        description: err.response?.data?.message || 'Could not add photo. Please try a smaller file.',
+        description: err.message || 'Could not add photo. Please try again.',
         variant: 'destructive',
       });
     } finally {

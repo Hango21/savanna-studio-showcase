@@ -7,6 +7,7 @@ const authRoutes = require('./routes/authRoutes');
 const slideRoutes = require('./routes/slideRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const photoRoutes = require('./routes/photoRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/slides', slideRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/photos', photoRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Error Handler
 app.use((err, req, res, next) => {

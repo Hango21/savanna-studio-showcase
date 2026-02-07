@@ -6,7 +6,7 @@ const upload = require('../middleware/uploadMiddleware');
 
 router.route('/')
     .get(getSlides)
-    .post(protect, upload.single('image'), createSlide);
+    .post(protect, createSlide);
 
 router.route('/:id')
     .delete(protect, deleteSlide);
