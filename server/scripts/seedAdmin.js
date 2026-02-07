@@ -10,10 +10,10 @@ const importData = async () => {
     try {
         await Admin.deleteMany();
 
-        const hashedPassword = await bcrypt.hash('admin123', 10);
+        const hashedPassword = await bcrypt.hash('hm252531', 10);
 
         const adminUser = {
-            username: 'admin',
+            username: 'melikaebrahim0@gmail.com',
             password: hashedPassword,
         };
 
