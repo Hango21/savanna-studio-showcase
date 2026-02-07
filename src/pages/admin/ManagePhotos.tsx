@@ -25,6 +25,8 @@ const ManagePhotos: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [newPhoto, setNewPhoto] = useState({ imageUrl: '', category: '' });
+  const [file, setFile] = useState<File | null>(null);
+  const [uploadMode, setUploadMode] = useState<'url' | 'file'>('file');
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -57,14 +59,33 @@ const ManagePhotos: React.FC = () => {
     setSubmitting(true);
 
     try {
-      await axios.post(API_ENDPOINTS.photos, newPhoto, {
-        headers: getAuthHeaders(),
+      const headers = getAuthHeaders();
+      let data: any;
+
+      if (uploadMode === 'file' && file) {
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('category', newPhoto.category);
+        // formData is multipart/form-data, axios sets Content-Type automatically
+        // but we need to ensure headers don't override it wrongly, usually fine
+        // getAuthHeaders returns { Authorization: ... }, axios merges it
+        data = formData;
+      } else {
+        data = newPhoto;
+      }
+
+      await axios.post(API_ENDPOINTS.photos, data, {
+        headers: {
+          ...headers,
+          ...(uploadMode === 'file' ? { 'Content-Type': 'multipart/form-data' } : {}),
+        },
       });
       toast({
         title: 'Success',
         description: 'Photo added successfully.',
       });
       setNewPhoto({ imageUrl: '', category: '' });
+      setFile(null);
       fetchData();
     } catch (err) {
       toast({
@@ -117,22 +138,55 @@ const ManagePhotos: React.FC = () => {
         <div className="bg-card border border-border p-6 rounded-lg">
           <h2 className="font-heading text-lg mb-4">Add New Photo</h2>
           <form onSubmit={handleAddPhoto} className="space-y-4">
+            <div className="flex gap-4 mb-4">
+              <Button
+                type="button"
+                variant={uploadMode === 'file' ? 'default' : 'outline'}
+                onClick={() => setUploadMode('file')}
+              >
+                Upload File
+              </Button>
+              <Button
+                type="button"
+                variant={uploadMode === 'url' ? 'default' : 'outline'}
+                onClick={() => setUploadMode('url')}
+              >
+                Image URL
+              </Button>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="imageUrl">Image URL</Label>
-                <Input
-                  id="imageUrl"
-                  value={newPhoto.imageUrl}
-                  onChange={(e) => setNewPhoto({ ...newPhoto, imageUrl: e.target.value })}
-                  placeholder="https://example.com/image.jpg"
-                  required
-                />
+                <Label htmlFor="imageInput">
+                  {uploadMode === 'file' ? 'Select Image' : 'Image URL'}
+                </Label>
+                {uploadMode === 'file' ? (
+                  <Input
+                    id="imageInput"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
+                    required={!newPhoto.imageUrl}
+                  />
+                ) : (
+                  <Input
+                    id="imageInput"
+                    value={newPhoto.imageUrl}
+                    onChange={(e) =>
+                      setNewPhoto({ ...newPhoto, imageUrl: e.target.value })
+                    }
+                    placeholder="https://example.com/image.jpg"
+                    required
+                  />
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="category">Category</Label>
                 <Select
                   value={newPhoto.category}
-                  onValueChange={(value) => setNewPhoto({ ...newPhoto, category: value })}
+                  onValueChange={(value) =>
+                    setNewPhoto({ ...newPhoto, category: value })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select a category" />

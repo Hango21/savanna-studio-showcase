@@ -26,8 +26,10 @@ const createPhoto = async (req, res) => {
                 folder: 'savanna/portfolio',
             });
             imageUrl = result.secure_url;
+        } else if (req.body.imageUrl) {
+            imageUrl = req.body.imageUrl;
         } else {
-            return res.status(400).json({ message: 'Please upload an image' });
+            return res.status(400).json({ message: 'Please upload an image or provide an image URL' });
         }
 
         const photo = await Photo.create({

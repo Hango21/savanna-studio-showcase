@@ -1,9 +1,14 @@
 const multer = require('multer');
 const path = require('path');
 
+const os = require('os');
+
 // Multer config
 const storage = multer.diskStorage({
-    // Store files temporarily in /tmp or system temp
+    // Store files temporarily in system temp (compatible with Vercel)
+    destination: (req, file, cb) => {
+        cb(null, os.tmpdir());
+    },
     filename: (req, file, cb) => {
         cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
     },

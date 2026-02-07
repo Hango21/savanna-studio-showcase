@@ -18,7 +18,9 @@ interface Slide {
 const ManageSlideshow: React.FC = () => {
   const [slides, setSlides] = useState<Slide[]>([]);
   const [loading, setLoading] = useState(true);
-  const [newSlide, setNewSlide] = useState({ title: '', imageUrl: '' });
+  const [newSlide, setNewSlide] = useState({ title: '', imageUrl: '', order: 0 });
+  const [file, setFile] = useState<File | null>(null);
+  const [uploadMode, setUploadMode] = useState<'url' | 'file'>('file');
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -27,11 +29,11 @@ const ManageSlideshow: React.FC = () => {
       const response = await axios.get(API_ENDPOINTS.slides, {
         headers: getAuthHeaders(),
       });
-      setSlides(response.data.sort((a: Slide, b: Slide) => a.order - b.order));
+      setSlides(response.data);
     } catch (err) {
       toast({
         title: 'Error',
-        description: 'Could not load slides. API may not be available.',
+        description: 'Could not load slides.',
         variant: 'destructive',
       });
     } finally {
@@ -48,16 +50,32 @@ const ManageSlideshow: React.FC = () => {
     setSubmitting(true);
 
     try {
-      await axios.post(
-        API_ENDPOINTS.slides,
-        { ...newSlide, order: slides.length + 1 },
-        { headers: getAuthHeaders() }
-      );
+      const headers = getAuthHeaders();
+      let data: any;
+
+      if (uploadMode === 'file' && file) {
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('title', newSlide.title);
+        formData.append('order', newSlide.order.toString());
+        formData.append('active', 'true');
+        data = formData;
+      } else {
+        data = { ...newSlide, active: true };
+      }
+
+      await axios.post(API_ENDPOINTS.slides, data, {
+        headers: {
+          ...headers,
+          ...(uploadMode === 'file' ? { 'Content-Type': 'multipart/form-data' } : {}),
+        },
+      });
       toast({
         title: 'Success',
         description: 'Slide added successfully.',
       });
-      setNewSlide({ title: '', imageUrl: '' });
+      setNewSlide({ title: '', imageUrl: '', order: 0 });
+      setFile(null);
       fetchSlides();
     } catch (err) {
       toast({
@@ -106,24 +124,66 @@ const ManageSlideshow: React.FC = () => {
         <div className="bg-card border border-border p-6 rounded-lg">
           <h2 className="font-heading text-lg mb-4">Add New Slide</h2>
           <form onSubmit={handleAddSlide} className="space-y-4">
+            <div className="flex gap-4 mb-4">
+              <Button
+                type="button"
+                variant={uploadMode === 'file' ? 'default' : 'outline'}
+                onClick={() => setUploadMode('file')}
+              >
+                Upload File
+              </Button>
+              <Button
+                type="button"
+                variant={uploadMode === 'url' ? 'default' : 'outline'}
+                onClick={() => setUploadMode('url')}
+              >
+                Image URL
+              </Button>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="title">Title</Label>
+                <Label htmlFor="title">Title (Optional)</Label>
                 <Input
                   id="title"
                   value={newSlide.title}
                   onChange={(e) => setNewSlide({ ...newSlide, title: e.target.value })}
-                  placeholder="Slide title"
-                  required
+                  placeholder="Slide Title"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="imageUrl">Image URL</Label>
+                <Label htmlFor="imageInput">
+                  {uploadMode === 'file' ? 'Select Image' : 'Image URL'}
+                </Label>
+                {uploadMode === 'file' ? (
+                  <Input
+                    id="imageInput"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
+                    required={!newSlide.imageUrl}
+                  />
+                ) : (
+                  <Input
+                    id="imageInput"
+                    value={newSlide.imageUrl}
+                    onChange={(e) =>
+                      setNewSlide({ ...newSlide, imageUrl: e.target.value })
+                    }
+                    placeholder="https://example.com/slide.jpg"
+                    required
+                  />
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="order">Order</Label>
                 <Input
-                  id="imageUrl"
-                  value={newSlide.imageUrl}
-                  onChange={(e) => setNewSlide({ ...newSlide, imageUrl: e.target.value })}
-                  placeholder="https://example.com/image.jpg"
+                  id="order"
+                  type="number"
+                  value={newSlide.order}
+                  onChange={(e) =>
+                    setNewSlide({ ...newSlide, order: parseInt(e.target.value) })
+                  }
                   required
                 />
               </div>
