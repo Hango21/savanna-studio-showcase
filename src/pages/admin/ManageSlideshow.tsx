@@ -54,6 +54,16 @@ const ManageSlideshow: React.FC = () => {
       let data: any;
 
       if (uploadMode === 'file' && file) {
+        if (file.size > 5 * 1024 * 1024) {
+          toast({
+            title: 'Error',
+            description: 'File size too large. Maximum size is 5MB.',
+            variant: 'destructive',
+          });
+          setSubmitting(false);
+          return;
+        }
+
         const formData = new FormData();
         formData.append('image', file);
         formData.append('title', newSlide.title);
@@ -69,6 +79,7 @@ const ManageSlideshow: React.FC = () => {
           ...headers,
           ...(uploadMode === 'file' ? { 'Content-Type': 'multipart/form-data' } : {}),
         },
+        timeout: 60000,
       });
       toast({
         title: 'Success',
@@ -77,10 +88,11 @@ const ManageSlideshow: React.FC = () => {
       setNewSlide({ title: '', imageUrl: '', order: 0 });
       setFile(null);
       fetchSlides();
-    } catch (err) {
+    } catch (err: any) {
+      console.error(err);
       toast({
         title: 'Error',
-        description: 'Could not add slide.',
+        description: err.response?.data?.message || 'Could not add slide. Please try a smaller file.',
         variant: 'destructive',
       });
     } finally {
