@@ -60,25 +60,18 @@ const GalleryGrid: React.FC = () => {
     const fetchPhotos = async () => {
       setLoading(true);
       try {
-        const url = activeCategory === 'all' 
-          ? API_ENDPOINTS.photos 
+        const url = activeCategory === 'all'
+          ? API_ENDPOINTS.photos
           : API_ENDPOINTS.photosByCategory(activeCategory);
         const response = await axios.get(url);
-        if (response.data.length > 0) {
-          setPhotos(response.data);
-        } else {
-          // Filter fallback photos by category
-          const filtered = activeCategory === 'all' 
-            ? fallbackPhotos 
-            : fallbackPhotos.filter(p => p.category === activeCategory);
-          setPhotos(filtered.length > 0 ? filtered : fallbackPhotos);
-        }
+        setPhotos(response.data);
       } catch (err) {
-        console.log('Using fallback photos');
-        const filtered = activeCategory === 'all' 
-          ? fallbackPhotos 
+        console.log('Error fetching photos:', err);
+        // Filter fallback photos by category for offline/error state
+        const filtered = activeCategory === 'all'
+          ? fallbackPhotos
           : fallbackPhotos.filter(p => p.category === activeCategory);
-        setPhotos(filtered.length > 0 ? filtered : fallbackPhotos);
+        setPhotos(filtered);
       } finally {
         setLoading(false);
       }
@@ -95,11 +88,10 @@ const GalleryGrid: React.FC = () => {
           <button
             key={category._id}
             onClick={() => setActiveCategory(category._id)}
-            className={`px-6 py-2 text-sm tracking-widest uppercase border transition-all duration-300 ${
-              activeCategory === category._id
+            className={`px-6 py-2 text-sm tracking-widest uppercase border transition-all duration-300 ${activeCategory === category._id
                 ? 'bg-foreground text-background border-foreground'
                 : 'bg-transparent text-foreground border-border hover:border-foreground'
-            }`}
+              }`}
           >
             {category.name}
           </button>
@@ -114,7 +106,7 @@ const GalleryGrid: React.FC = () => {
           ))}
         </div>
       ) : (
-        <motion.div 
+        <motion.div
           layout
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
         >

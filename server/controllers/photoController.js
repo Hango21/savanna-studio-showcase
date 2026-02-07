@@ -6,7 +6,10 @@ const cloudinary = require('../config/cloudinary');
 // @access  Public
 const getPhotos = async (req, res) => {
     try {
-        const photos = await Photo.find().populate('category');
+        const { category } = req.query;
+        const query = category ? { category } : {};
+
+        const photos = await Photo.find(query).populate('category');
         res.json(photos);
     } catch (error) {
         res.status(500).json({ message: 'Server Error' });
