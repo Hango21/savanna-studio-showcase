@@ -55,9 +55,19 @@ const Index: React.FC = () => {
     <Layout>
       {/* Hero Section with Slideshow */}
       <section className="relative overflow-hidden">
+        {settings.home_hero_top && (
+          <div
+            className="absolute inset-0 z-0 opacity-20 blur-sm pointer-events-none"
+            style={{
+              backgroundImage: `url(${settings.home_hero_top})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          />
+        )}
         <motion.div
           style={{ y: heroY }}
-          className="container-boxed py-8"
+          className="container-boxed py-8 relative z-10"
         >
           <Slideshow />
           <motion.div
@@ -182,9 +192,9 @@ const Index: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { title: 'Weddings', image: weddingImage },
-              { title: 'Maternity', image: maternityImage },
-              { title: 'Family', image: familyImage },
+              { title: 'Weddings', image: settings.home_service_weddings || weddingImage },
+              { title: 'Maternity', image: settings.home_service_maternity || maternityImage },
+              { title: 'Family', image: settings.home_service_family || familyImage },
             ].map((service, index) => (
               <motion.div
                 key={service.title}
